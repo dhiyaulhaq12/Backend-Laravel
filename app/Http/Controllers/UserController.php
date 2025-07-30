@@ -11,10 +11,25 @@ class UserController extends Controller
     {
         return User::all();
     }
-
+    
     public function store(Request $request)
     {
-        return User::create($request->all());
+        $data = $request->all();
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
+        return User::create($data);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $data = $request->all();
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
+        $user->update($data);
+        return $user;
     }
 
     public function show($id)
@@ -22,15 +37,9 @@ class UserController extends Controller
         return User::findOrFail($id);
     }
 
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        $user->update($request->all());
-        return $user;
-    }
-
     public function destroy($id)
     {
         User::destroy($id);
         return response()->json(['message' => 'User deleted']);
-    }}
+    }
+}

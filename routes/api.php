@@ -5,6 +5,7 @@ use App\Http\Controllers\itemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,4 @@ use Illuminate\Support\Facades\Route;
 // Resource API route untuk Item, tapi menggunakan PostController
 Route::apiResource('items', itemController::class);
 Route::apiResource('users', UserController::class);
+Route::post('/login', [AuthController::class, 'login']);
