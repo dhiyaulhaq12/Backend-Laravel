@@ -20,5 +20,5 @@ use App\Http\Controllers\AuthController;
 
 // Resource API route untuk Item, tapi menggunakan PostController
 Route::apiResource('items', itemController::class);
-Route::apiResource('users', UserController::class);
+Route::apiResource('register', UserController::class);
 Route::post('/login', [AuthController::class, 'login']);
