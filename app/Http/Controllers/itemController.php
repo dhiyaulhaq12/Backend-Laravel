@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
 
 class ItemController extends Controller
 {
@@ -24,10 +26,13 @@ class ItemController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('items', 'public');
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $validated['image'] = $uploadedFileUrl;
         }
 
-        return Item::create($validated);
+        $item = Item::create($validated);
+
+        return response()->json($item);
     }
 
     public function show($id)
@@ -47,25 +52,13 @@ class ItemController extends Controller
         'image'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
     ]);
 
-    if ($request->hasFile('image')) {
-        if ($item->image) {
-            \Storage::disk('public')->delete($item->image);
-            \Log::info('Ada file yang dikirim!');
+        if ($request->hasFile('image')) {
+            // Optional: kamu bisa hapus dari Cloudinary jika sebelumnya disimpan URL lama
+        
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $validated['image'] = $uploadedFileUrl;
         }
-        $validated['image'] = $request->file('image')->store('items', 'public');
-    } elseif ($request->has('image') && !$request->file('image')) {
-        // Postman kirim key image kosong -> jangan timpa
-        unset($validated['image']);
     }
-
-    $item->update($validated);
-
-    return response()->json([
-        'message'   => 'Item berhasil diupdate',
-        'data'      => $item,
-        'image_url' => $item->image ? asset('storage/'.$item->image) : null,
-    ]);
-}
 
     public function destroy($id)
     {
